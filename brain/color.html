@@ -58,7 +58,7 @@
         let model;
         let modelName = getUrlParameter('model') || 'brain.glb';
         let modelScale = parseFloat(getUrlParameter('scale')) || 10;
-        let modelColor = getUrlParameter('color') || '#ff0000'; // default to red
+        let modelColor = getUrlParameter('color') || '#00ff00'; // default to red
 
         // Load the GLB model
         const loader = new THREE.GLTFLoader(manager);
