@@ -41,8 +41,8 @@
             // Get cube color and background color from URL parameters
             let bgColor = getUrlParameter('bg_color') || '0x000000';
             let cubeColor = getUrlParameter('cube_color') || '0x00ff00';
-            let modelColor = getUrlParameter('model_color') || '#00ff00'; // default to green
-            let modelScale = parseFloat(getUrlParameter('scale')) || 0.5;
+            let modelColor = getUrlParameter('model_color') || '#ff0000'; // default to green
+            let modelScale = parseFloat(getUrlParameter('scale')) || 1.0;
 
             // Create scene
             scene = new THREE.Scene();
@@ -60,7 +60,7 @@
             document.body.appendChild(renderer.domElement);
 
             // Create cube in the center
-            const geometry = new THREE.BoxGeometry(1.0, 1.0, 1.0);
+            const geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
             const material = new THREE.MeshBasicMaterial({ color: parseInt(cubeColor, 16) });
             cube = new THREE.Mesh(geometry, material);
             scene.add(cube);
