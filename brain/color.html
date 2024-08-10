@@ -7,9 +7,20 @@
     <style>
         body { margin: 0; }
         canvas { display: block; }
+        #displayText {
+          position: absolute;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 24px;
+          color: white;
+          z-index: 1;
+          text-shadow: 2px 2px 4px #000000;
+        }        
     </style>
 </head>
 <body>
+    <div id="displayText"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -107,6 +118,26 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
+
+        // JavaScript function to update the color of the model dynamically
+        function updateModelColor(color) {
+            if (model) {
+                model.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.material.color.set(color);
+                    }
+                });
+            }
+        }
+
+        // Expose the function to the global scope
+        window.updateModelColor = updateModelColor;
+
+        // JavaScript function to update the text above the cube
+        window.displayTextAboveCube = function(inputString) {
+          document.getElementById('displayText').innerText = inputString;
+        }        
+        
     </script>
 </body>
 </html>
