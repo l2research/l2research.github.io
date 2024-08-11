@@ -9,7 +9,7 @@
         canvas { display: block; }
         #displayText {
             position: absolute;
-            top: 20px;
+            bottom: 20px; /* Moved to the bottom */
             left: 50%;
             transform: translateX(-50%);
             font-size: 24px;
@@ -46,7 +46,7 @@
 
         function init() {
             // Get cube color and background color from URL parameters
-            let bgColor = getUrlParameter('bg_color') || '0x000000';
+            let bgColor = getUrlParameter('bg_color') || '0x0000ff';
             let cubeColor = getUrlParameter('cube_color') || '0x00ff00';
             let modelColor = getUrlParameter('model_color') || '#ff0000';
             let modelScale = parseFloat(getUrlParameter('scale')) || 0.8;
@@ -89,7 +89,7 @@
             const loader = new THREE.GLTFLoader();
             loader.load('brain.glb', function (gltf) {
                 model = gltf.scene;
-                model.position.set(1.8, 1.8, 0); // Positioning at the top right
+                model.position.set(2.0, 2.0, 0); // Positioning at the top right
                 model.scale.set(modelScale, modelScale, modelScale);
 
                 // Change the color of the model
