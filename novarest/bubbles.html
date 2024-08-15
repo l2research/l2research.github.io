@@ -35,40 +35,23 @@
         let scene, camera, renderer, model, composer;
         let bubbles = [];
 
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
-
-        init();
-        animate();
-
         function init() {
-            // Get background color from URL parameter
-            let bgColor = getUrlParameter('bg_color') || '0x000000'; // Default to black
-            let modelColor = getUrlParameter('model_color') || '#c88d94';
-            let modelScale = parseFloat(getUrlParameter('scale')) || 0.8;
-
-            // Create scene
+            // Set up the scene
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(parseInt(bgColor, 16));
+            scene.background = new THREE.Color(0x000000);  // Background is black
+            scene.fog = new THREE.Fog(scene.background, 1, 15);  // Adjusted fog parameters
 
-            // Add fog for a dreamy effect
-            scene.fog = new THREE.Fog(scene.background, 1, 10);
-
-            // Create camera
+            // Set up the camera
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 2, 5);
 
-            // Create renderer
+            // Set up the renderer
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
 
-            // Post-processing for bloom effect
+            // Post-processing setup
             composer = new THREE.EffectComposer(renderer);
             const renderPass = new THREE.RenderPass(scene, camera);
             composer.addPass(renderPass);
@@ -83,20 +66,19 @@
             const loader = new THREE.GLTFLoader();
             loader.load('brain.glb', function (gltf) {
                 model = gltf.scene;
-                model.position.set(2.0, 2.0, 0); // Positioning at the top right
-                model.scale.set(modelScale, modelScale, modelScale);
+                model.position.set(2.0, 2.0, 0);
+                model.scale.set(0.8, 0.8, 0.8);
 
-                // Change the color of the model
                 model.traverse(function (child) {
                     if (child.isMesh) {
-                        child.material.color.set(modelColor);
+                        child.material.color.set(0xc88d94);  // Default model color
                     }
                 });
 
                 scene.add(model);
             });
 
-            // Add some light
+            // Add lighting
             const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
             scene.add(hemisphereLight);
 
@@ -125,14 +107,14 @@
                 bubbles.push(bubble);
             }
 
-            // Set up OrbitControls for camera movement
+            // Set up OrbitControls
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.25;
             controls.screenSpacePanning = false;
             controls.maxPolarAngle = Math.PI / 2;
 
-            // Resize handler
+            // Handle window resize
             window.addEventListener('resize', onWindowResize, false);
         }
 
@@ -144,14 +126,27 @@
         }
 
         function animate() {
-            renderer.setAnimationLoop(render);
-        }
+            requestAnimationFrame(animate);
 
-        function render() {
-            // Update bubbles position
+            // Update bubble positions
             bubbles.forEach(bubble => {
                 bubble.position.y += bubble.speed;
                 if (bubble.position.y > 30) {
                     bubble.position.y = -30;
                     bubble.position.x = Math.random() * 50 - 25;
-                    bubble.position.z = Math.
+                    bubble.position.z = Math.random() * 50 - 25;
+                }
+            });
+
+            if (model) {
+                model.rotation.y += 0.01; // Rotate the brain model
+            }
+
+            composer.render();
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
