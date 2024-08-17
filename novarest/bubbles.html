@@ -34,11 +34,14 @@
     <script>
         let scene, camera, renderer, model, composer;
         let bubbles = [];
+        let brainColor = new THREE.Color(0xc88d94); // Default brain color
+        let bubbleColor = new THREE.Color(0x99ccff); // Default bubble color
+        let backgroundColor = new THREE.Color(0x000000); // Default background color
 
         function init() {
             // Set up the scene
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000000);  // Background is black
+            scene.background = backgroundColor;  // Set initial background color
             scene.fog = new THREE.Fog(scene.background, 1, 15);  // Adjusted fog parameters
 
             // Set up the camera
@@ -62,7 +65,7 @@
             bloomPass.radius = 0.5;
             composer.addPass(bloomPass);
 
-            // Load the brain model at the top right corner
+            // Load the brain model
             const loader = new THREE.GLTFLoader();
             loader.load('brain.glb', function (gltf) {
                 model = gltf.scene;
@@ -71,7 +74,7 @@
 
                 model.traverse(function (child) {
                     if (child.isMesh) {
-                        child.material.color.set(0xc88d94);  // Default model color
+                        child.material.color.copy(brainColor);  // Set initial brain color
                     }
                 });
 
@@ -90,7 +93,7 @@
             for (let i = 0; i < 500; i++) {  // Increased the number of bubbles to 500
                 const geometry = new THREE.SphereGeometry(Math.random() * 0.5 + 0.2, 32, 32);  // Reduced bubble size
                 const material = new THREE.MeshBasicMaterial({
-                    color: 0x99ccff,
+                    color: bubbleColor,
                     opacity: 0.8,
                     transparent: true
                 });
@@ -145,8 +148,31 @@
             composer.render();
         }
 
+        // Function to update colors
+        function updateColors(brainHex, bubbleHex, backgroundHex) {
+            brainColor.set(brainHex);
+            bubbleColor.set(bubbleHex);
+            backgroundColor.set(backgroundHex);
+            scene.background = backgroundColor;  // Update background color
+
+            if (model) {
+                model.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.material.color.copy(brainColor);  // Update brain color
+                    }
+                });
+            }
+
+            bubbles.forEach(bubble => {
+                bubble.material.color.copy(bubbleColor);  // Update bubble color
+            });
+        }
+
         init();
         animate();
+
+        // Expose the updateColors function globally for external calls
+        window.updateColors = updateColors;
     </script>
 </body>
 </html>
