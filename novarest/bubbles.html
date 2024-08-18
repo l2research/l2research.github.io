@@ -148,24 +148,35 @@
             composer.render();
         }
 
-        // Function to update colors
-        function updateColors(brainHex, bubbleHex, backgroundHex) {
-            brainColor.set(brainHex);
-            bubbleColor.set(bubbleHex);
-            backgroundColor.set(backgroundHex);
-            scene.background = backgroundColor;  // Update background color
-
+        // Function to update the brain model color dynamically
+        window.updateBrainColor = function(color) {
             if (model) {
                 model.traverse(function (child) {
                     if (child.isMesh) {
-                        child.material.color.copy(brainColor);  // Update brain color
+                        child.material.color.set(color);
                     }
                 });
             }
+        };
 
+        // Function to update the bubbles' color dynamically
+        window.updateBubbleColor = function(color) {
             bubbles.forEach(bubble => {
-                bubble.material.color.copy(bubbleColor);  // Update bubble color
+                bubble.material.color.set(color);
             });
+        };
+
+        // Function to update the background color dynamically
+        window.updateBackgroundColor = function(color) {
+            scene.background.set(color);
+            scene.fog.color.set(color);
+        };
+
+        // Function to update all colors
+        function updateColors(brainHex, bubbleHex, backgroundHex) {
+            updateBrainColor(brainHex);
+            updateBubbleColor(bubbleHex);
+            updateBackgroundColor(backgroundHex);
         }
 
         init();
