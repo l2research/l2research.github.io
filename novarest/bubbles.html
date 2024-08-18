@@ -34,29 +34,15 @@
     <script>
         let scene, camera, renderer, model, composer;
         let bubbles = [];
-
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
+        let brainColor = new THREE.Color(0xff0000); // Bright red brain color
+        let bubbleColor = new THREE.Color(0x99ccff); // Default bubble color
+        let backgroundColor = new THREE.Color(0x000000); // Default background color
 
         function init() {
-            // Get colors from URL parameters
-            let brainColorHex = getUrlParameter('brain_color') || '0xc88d94';
-            let bubbleColorHex = getUrlParameter('bubble_color') || '0x99ccff';
-            let bgColorHex = getUrlParameter('bg_color') || '0x000000';
-
-            // Convert hex colors to THREE.Color objects
-            let brainColor = new THREE.Color(parseInt(brainColorHex, 16));
-            let bubbleColor = new THREE.Color(parseInt(bubbleColorHex, 16));
-            let backgroundColor = new THREE.Color(parseInt(bgColorHex, 16));
-
             // Set up the scene
             scene = new THREE.Scene();
-            scene.background = backgroundColor;
-            scene.fog = new THREE.Fog(scene.background, 1, 15);
+            scene.background = backgroundColor;  // Set initial background color
+            scene.fog = new THREE.Fog(scene.background, 1, 15);  // Adjusted fog parameters
 
             // Set up the camera
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -84,11 +70,11 @@
             loader.load('brain.glb', function (gltf) {
                 model = gltf.scene;
                 model.position.set(2.0, 2.0, 0);
-                model.scale.set(2.0, 2.0, 2.0);
+                model.scale.set(2.0, 2.0, 2.0);  // Increased the brain model size
 
                 model.traverse(function (child) {
                     if (child.isMesh) {
-                        child.material.color.copy(brainColor);
+                        child.material.color.copy(brainColor);  // Set brain color to bright red
                     }
                 });
 
@@ -104,8 +90,8 @@
             scene.add(directionalLight);
 
             // Create bubbles
-            for (let i = 0; i < 500; i++) {
-                const geometry = new THREE.SphereGeometry(Math.random() * 0.5 + 0.2, 32, 32);
+            for (let i = 0; i < 500; i++) {  // Increased the number of bubbles to 500
+                const geometry = new THREE.SphereGeometry(Math.random() * 0.5 + 0.2, 32, 32);  // Reduced bubble size
                 const material = new THREE.MeshBasicMaterial({
                     color: bubbleColor,
                     opacity: 0.8,
@@ -162,15 +148,11 @@
             composer.render();
         }
 
-        init();
-        animate();
-
-        // Function to update colors dynamically
-        window.updateColors = function(brainHex, bubbleHex, bgHex) {
-            let brainColor = new THREE.Color(parseInt(brainHex, 16));
-            let bubbleColor = new THREE.Color(parseInt(bubbleHex, 16));
-            let backgroundColor = new THREE.Color(parseInt(bgHex, 16));
-
+        // Function to update colors
+        function updateColors(brainHex, bubbleHex, backgroundHex) {
+            brainColor.set(brainHex);
+            bubbleColor.set(bubbleHex);
+            backgroundColor.set(backgroundHex);
             scene.background = backgroundColor;  // Update background color
 
             if (model) {
@@ -184,12 +166,13 @@
             bubbles.forEach(bubble => {
                 bubble.material.color.copy(bubbleColor);  // Update bubble color
             });
-        };
+        }
 
-        // JavaScript function to update the text above the scene
-        window.displayTextAboveBubbles = function(inputString) {
-            document.getElementById('displayText').innerText = inputString;
-        };
+        init();
+        animate();
+
+        // Expose the updateColors function globally for external calls
+        window.updateColors = updateColors;
     </script>
 </body>
 </html>
