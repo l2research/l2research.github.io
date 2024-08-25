@@ -29,12 +29,12 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
     <script>
-        let scene, camera, renderer, bubbles = [], model, composer;
+        let scene, camera, renderer, composer, bubbles = [], model;
 
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
 
@@ -42,10 +42,10 @@
         animate();
 
         function init() {
-            let bgColor = getUrlParameter('bg_color') || '0x0000ff';
-            let bubbleColor = getUrlParameter('bubble_color') || '0xffffff';
-            let modelColor = getUrlParameter('model_color') || '#c88d94';
-            let modelScale = parseFloat(getUrlParameter('scale')) || 0.8;
+            const bgColor = getUrlParameter('bg_color') || '0x0000ff';
+            const bubbleColor = getUrlParameter('bubble_color') || '0xffffff';
+            const modelColor = getUrlParameter('model_color') || '#c88d94';
+            const modelScale = parseFloat(getUrlParameter('scale')) || 0.8;
 
             // Create scene
             scene = new THREE.Scene();
@@ -76,10 +76,11 @@
             composer.addPass(bloomPass);
 
             // Create bubbles
+            const bubbleGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+            const bubbleMaterial = new THREE.MeshBasicMaterial({ color: parseInt(bubbleColor, 16), transparent: true, opacity: 0.8 });
+            
             for (let i = 0; i < 100; i++) {
-                const geometry = new THREE.SphereGeometry(Math.random() * 0.1, 32, 32);
-                const material = new THREE.MeshBasicMaterial({ color: parseInt(bubbleColor, 16), transparent: true, opacity: 0.8 });
-                const bubble = new THREE.Mesh(geometry, material);
+                const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial);
                 bubble.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, Math.random() * 4 - 2);
                 bubbles.push(bubble);
                 scene.add(bubble);
@@ -128,7 +129,8 @@
         }
 
         function animate() {
-            renderer.setAnimationLoop(render);
+            requestAnimationFrame(animate);
+            render();
         }
 
         function render() {
