@@ -13,7 +13,7 @@
     </style>
 </head>
 <body>
-    <video id="example-video" loop>
+    <video id="example-video" loop autoplay muted>
         <source src="meditation.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
@@ -41,7 +41,8 @@
 
             // Movie screen
             const screenGeometry = new THREE.PlaneGeometry(4, 2);
-            const video = document.getElementById('example-video');
+            var video = document.getElementById('example-video');
+            video.muted = false;
             video.play();
             videoTexture = new THREE.VideoTexture(video);
             const screenMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
