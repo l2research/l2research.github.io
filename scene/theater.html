@@ -42,6 +42,7 @@
             // Movie screen
             const screenGeometry = new THREE.PlaneGeometry(4, 2);
             const video = document.getElementById('example-video');
+            video.play();
             videoTexture = new THREE.VideoTexture(video);
             const screenMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
             screenMesh = new THREE.Mesh(screenGeometry, screenMaterial);
