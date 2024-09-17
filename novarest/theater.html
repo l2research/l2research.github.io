@@ -29,6 +29,9 @@
         animate();
 
         function init() {
+            const modelColor = getUrlParameter('model_color') || '#c88d94';
+            const modelScale = parseFloat(getUrlParameter('scale')) || 3.0;
+            
             // Scene setup
             scene = new THREE.Scene();
 
@@ -53,8 +56,6 @@
             scene.add(screenMesh);
 
             // Load the brain model at the top right corner
-            const modelScale = 2.0; // Scale for the brain model
-            const modelColor = #c88d94; // Color for the brain model
             const loader = new THREE.GLTFLoader();
             loader.load('brain.glb', function (gltf) {
                 model = gltf.scene;
