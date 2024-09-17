@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Movie Theater</title>
+    <title>Ocean Scene with Video</title>
     <style>
         body { margin: 0; }
         canvas { display: block; }
@@ -20,73 +20,105 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/objects/Water.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/objects/Sky.js"></script>
 
     <script>
-        let scene, camera, renderer, videoTexture, screenMesh;
+        let scene, camera, renderer, controls, water, sky, videoTexture, screenMesh;
 
         init();
         animate();
 
         function init() {
+            // Scene setup
             scene = new THREE.Scene();
 
-            // Set up camera
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 2, 8); // Adjust camera distance to fit the larger screen
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 20000);
+            camera.position.set(30, 30, 100);
 
-            // Set up renderer
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
-            // Larger movie screen
-            const screenGeometry = new THREE.PlaneGeometry(8, 4.5); // Larger screen size (16:9 aspect ratio)
+            // Controls setup
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.maxPolarAngle = Math.PI * 0.495;
+            controls.target.set(0, 10, 0);
+            controls.minDistance = 40.0;
+            controls.maxDistance = 200.0;
+            controls.update();
+
+            // Water setup
+            const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
+
+            water = new THREE.Water(
+                waterGeometry,
+                {
+                    textureWidth: 512,
+                    textureHeight: 512,
+                    waterNormals: new THREE.TextureLoader().load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/waternormals.jpg', function (texture) {
+                        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    }),
+                    alpha: 1.0,
+                    sunDirection: new THREE.Vector3(),
+                    sunColor: 0xffffff,
+                    waterColor: 0x001e0f,
+                    distortionScale: 3.7,
+                    fog: scene.fog !== undefined
+                }
+            );
+
+            water.rotation.x = -Math.PI / 2;
+            scene.add(water);
+
+            // Skybox setup
+            sky = new THREE.Sky();
+            sky.scale.setScalar(10000);
+            scene.add(sky);
+
+            const sun = new THREE.Vector3();
+            const uniforms = sky.material.uniforms;
+            uniforms['turbidity'].value = 10;
+            uniforms['rayleigh'].value = 2;
+            uniforms['mieCoefficient'].value = 0.005;
+            uniforms['mieDirectionalG'].value = 0.8;
+
+            const parameters = {
+                elevation: 2,
+                azimuth: 180
+            };
+
+            const pmremGenerator = new THREE.PMREMGenerator(renderer);
+            let renderTarget;
+
+            function updateSun() {
+                const phi = THREE.MathUtils.degToRad(90 - parameters.elevation);
+                const theta = THREE.MathUtils.degToRad(parameters.azimuth);
+
+                sun.setFromSphericalCoords(1, phi, theta);
+
+                sky.material.uniforms['sunPosition'].value.copy(sun);
+                water.material.uniforms['sunDirection'].value.copy(sun).normalize();
+
+                if (renderTarget !== undefined) renderTarget.dispose();
+                renderTarget = pmremGenerator.fromScene(sky);
+                scene.environment = renderTarget.texture;
+            }
+
+            updateSun();
+
+            // Video screen setup
+            const screenGeometry = new THREE.PlaneGeometry(16, 9); // Aspect ratio 16:9
             var video = document.getElementById('example-video');
             video.muted = false;
             video.play();
             videoTexture = new THREE.VideoTexture(video);
             const screenMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
             screenMesh = new THREE.Mesh(screenGeometry, screenMaterial);
-            screenMesh.position.set(0, 2.5, -7); // Adjust screen position for larger screen
+            screenMesh.position.set(0, 20, -50); // Position the screen in front of the camera in the middle
             scene.add(screenMesh);
-
-            // Theater room (walls, ceiling, floor)
-            const theaterMaterial = new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide });
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), theaterMaterial);
-            floor.rotation.x = -Math.PI / 2;
-            floor.position.y = 0;
-            scene.add(floor);
-
-            const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), theaterMaterial);
-            ceiling.rotation.x = Math.PI / 2;
-            ceiling.position.y = 5;
-            scene.add(ceiling);
-
-            const backWall = new THREE.Mesh(new THREE.PlaneGeometry(20, 10), theaterMaterial);
-            backWall.position.z = -10;
-            backWall.position.y = 2.5;
-            scene.add(backWall);
-
-            const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(20, 10), theaterMaterial);
-            leftWall.rotation.y = Math.PI / 2;
-            leftWall.position.x = -10;
-            leftWall.position.y = 2.5;
-            scene.add(leftWall);
-
-            const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(20, 10), theaterMaterial);
-            rightWall.rotation.y = -Math.PI / 2;
-            rightWall.position.x = 10;
-            rightWall.position.y = 2.5;
-            scene.add(rightWall);
-
-            // Relaxing background lighting
-            const ambientLight = new THREE.AmbientLight(0x404040, 2); // Soft light
-            scene.add(ambientLight);
-
-            // Camera controls
-            const controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.target.set(0, 2.5, -7);
-            controls.update();
 
             window.addEventListener('resize', onWindowResize, false);
         }
@@ -99,6 +131,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
+            water.material.uniforms['time'].value += 1.0 / 60.0;
             renderer.render(scene, camera);
         }
     </script>
