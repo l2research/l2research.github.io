@@ -71,35 +71,6 @@
                 scene.add(model);
             });
 
-            // Theater room (walls, ceiling, floor)
-            const theaterMaterial = new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide });
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), theaterMaterial);
-            floor.rotation.x = -Math.PI / 2;
-            floor.position.y = 0;
-            scene.add(floor);
-
-            const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), theaterMaterial);
-            ceiling.rotation.x = Math.PI / 2;
-            ceiling.position.y = 5;
-            scene.add(ceiling);
-
-            const backWall = new THREE.Mesh(new THREE.PlaneGeometry(20, 10), theaterMaterial);
-            backWall.position.z = -10;
-            backWall.position.y = 2.5;
-            scene.add(backWall);
-
-            const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(20, 10), theaterMaterial);
-            leftWall.rotation.y = Math.PI / 2;
-            leftWall.position.x = -10;
-            leftWall.position.y = 2.5;
-            scene.add(leftWall);
-
-            const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(20, 10), theaterMaterial);
-            rightWall.rotation.y = -Math.PI / 2;
-            rightWall.position.x = 10;
-            rightWall.position.y = 2.5;
-            scene.add(rightWall);
-
             // Ambient light for better visibility
             const ambientLight = new THREE.AmbientLight(0x404040, 2); // Soft light
             scene.add(ambientLight);
