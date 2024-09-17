@@ -20,10 +20,12 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/loaders/GLTFLoader.js"></script>
 
     <script>
-        let scene, camera, renderer, videoTexture, screenMesh, brainMesh;
+        let scene, camera, renderer, videoTexture, screenMesh, model;
+        const modelScale = 0.5; // Scale for the brain model
+        const modelColor = 0xff0000; // Color for the brain model
 
         init();
         animate();
@@ -52,13 +54,21 @@
             screenMesh.position.set(0, 2.5, -7); // Position screen in front
             scene.add(screenMesh);
 
-            // Brain model loader (from demo.html)
-            const objLoader = new THREE.OBJLoader();
-            objLoader.load('https://raw.githubusercontent.com/l2research/l2research.github.io/main/novarest/brain.obj', function (object) {
-                brainMesh = object;
-                brainMesh.scale.set(0.5, 0.5, 0.5); // Adjust size of the brain
-                brainMesh.position.set(0, 2, 0); // Position brain in the center
-                scene.add(brainMesh);
+            // Load the brain model at the top right corner
+            const loader = new THREE.GLTFLoader();
+            loader.load('brain.glb', function (gltf) {
+                model = gltf.scene;
+                model.position.set(2.0, 2.0, 0); // Positioning at the top right
+                model.scale.set(modelScale, modelScale, modelScale);
+
+                // Change the color of the model
+                model.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.material.color.set(modelColor);
+                    }
+                });
+
+                scene.add(model);
             });
 
             // Theater room (walls, ceiling, floor)
@@ -112,8 +122,8 @@
             requestAnimationFrame(animate);
 
             // Optional: rotate the brain model
-            if (brainMesh) {
-                brainMesh.rotation.y += 0.01;
+            if (model) {
+                model.rotation.y += 0.01;
             }
 
             renderer.render(scene, camera);
