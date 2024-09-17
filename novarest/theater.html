@@ -24,8 +24,6 @@
 
     <script>
         let scene, camera, renderer, videoTexture, screenMesh, model;
-        const modelScale = 2.0; // Scale for the brain model
-        const modelColor = 0xff0000; // Color for the brain model
 
         init();
         animate();
@@ -55,6 +53,8 @@
             scene.add(screenMesh);
 
             // Load the brain model at the top right corner
+            const modelScale = 2.0; // Scale for the brain model
+            const modelColor = #c88d94; // Color for the brain model
             const loader = new THREE.GLTFLoader();
             loader.load('brain.glb', function (gltf) {
                 model = gltf.scene;
