@@ -14,7 +14,7 @@
 </head>
 <body>
     <video id="example-video" loop autoplay muted>
-        <source src="videos/A_New_Day.mp4" type="video/mp4">
+        <source id="video-source" src="videos/A_New_Day.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
@@ -100,6 +100,21 @@
 
             renderer.render(scene, camera);
         }
+
+        // Example of how to call the function
+        // playNewVideo('videos/Your_New_Video.mp4');        
+        function playNewVideo(videoPath) {
+            var videoElement = document.getElementById("theater-video");
+            var sourceElement = document.getElementById("video-source");
+
+            // Overwrite the video source
+            sourceElement.src = videoPath;
+
+            // Load and play the new video
+            videoElement.load();
+            videoElement.play();
+        }
+    
     </script>
 </body>
 </html>
