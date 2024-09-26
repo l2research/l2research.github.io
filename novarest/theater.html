@@ -106,9 +106,17 @@
             var videoElement = document.getElementById("theater-video");
             var sourceElement = document.getElementById("video-source");
         
+            // Ensure the video is fully opaque
+            videoElement.style.opacity = 1;
+        
             // Apply fade-out effect
             videoElement.style.transition = "opacity 1s ease"; // Set transition effect
-            videoElement.style.opacity = 0;  // Start fading out
+        
+            // Force reflow
+            void videoElement.offsetWidth;
+        
+            // Start fading out
+            videoElement.style.opacity = 0;
         
             // Wait for the fade-out to complete before switching the video
             setTimeout(function () {
@@ -118,13 +126,22 @@
         
                 // Ensure the fade-in happens after the video can be played
                 videoElement.oncanplay = function () {
+                    // Remove the event listener to prevent multiple triggers
+                    videoElement.oncanplay = null;
+        
+                    // Apply fade-in effect
                     videoElement.style.transition = "opacity 1s ease";  // Ensure fade-in transition is set
-                    videoElement.style.opacity = 1;  // Fade in
+        
+                    // Force reflow
+                    void videoElement.offsetWidth;
+        
+                    // Start fading in
+                    videoElement.style.opacity = 1;
+        
                     videoElement.play();  // Start playing the video
                 };
             }, 1000);  // 1 second timeout to match the fade-out duration
         }
-
 
     </script>
 </body>
