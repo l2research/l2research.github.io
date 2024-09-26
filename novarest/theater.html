@@ -111,7 +111,12 @@
 
             // Load and play the new video
             videoElement.load();
-            videoElement.play();
+
+            // Apply fade-in effect once the video has loaded
+            videoElement.oncanplay = function () {
+                videoElement.style.opacity = 1;  // Fade in
+                videoElement.play();  // Play the new video
+            };
         }
     
     </script>
