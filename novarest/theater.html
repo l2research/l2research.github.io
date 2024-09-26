@@ -107,24 +107,24 @@
             var sourceElement = document.getElementById("video-source");
         
             // Apply fade-out effect
-            videoElement.style.transition = "opacity 3s ease"; // Set transition effect
-            videoElement.style.opacity = 0;  // Fade out
+            videoElement.style.transition = "opacity 1s ease"; // Set transition effect
+            videoElement.style.opacity = 0;  // Start fading out
         
-            // Use setTimeout to wait for the fade-out transition to complete (1 second)
+            // Wait for the fade-out to complete before switching the video
             setTimeout(function () {
-                // Update the video source
+                // Update the video source after fade-out
                 sourceElement.src = videoPath;
+                videoElement.load();  // Load the new video
         
-                // Load the new video
-                videoElement.load();
-        
-                // Apply fade-in effect once the video has loaded and is ready to play
+                // Ensure the fade-in happens after the video can be played
                 videoElement.oncanplay = function () {
+                    videoElement.style.transition = "opacity 1s ease";  // Ensure fade-in transition is set
                     videoElement.style.opacity = 1;  // Fade in
-                    videoElement.play();  // Play the new video
+                    videoElement.play();  // Start playing the video
                 };
-            }, 3000);  // Wait 1 second to ensure fade-out is done before switching videos
+            }, 1000);  // 1 second timeout to match the fade-out duration
         }
+
 
     </script>
 </body>
