@@ -105,20 +105,27 @@
         function playNewVideo(videoPath) {
             var videoElement = document.getElementById("theater-video");
             var sourceElement = document.getElementById("video-source");
-
-            // Overwrite the video source
-            sourceElement.src = videoPath;
-
-            // Load and play the new video
-            videoElement.load();
-
-            // Apply fade-in effect once the video has loaded
-            videoElement.oncanplay = function () {
-                videoElement.style.opacity = 1;  // Fade in
-                videoElement.play();  // Play the new video
+        
+            // Apply fade-out effect
+            videoElement.style.transition = "opacity 1s ease"; // Set transition effect
+            videoElement.style.opacity = 0;  // Fade out
+        
+            // After the fade-out is complete, change the video source
+            videoElement.ontransitionend = function () {
+                // Update the video source
+                sourceElement.src = videoPath;
+        
+                // Load the new video
+                videoElement.load();
+        
+                // Apply fade-in effect once the video has loaded
+                videoElement.oncanplay = function () {
+                    videoElement.style.opacity = 1;  // Fade in
+                    videoElement.play();  // Play the new video
+                };
             };
         }
-    
+
     </script>
 </body>
 </html>
