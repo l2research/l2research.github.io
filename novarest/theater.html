@@ -5,16 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Movie Theater with Brain Model</title>
     <style>
-        body { margin: 0; }
-        canvas { display: block; }
-        video {
-            display: none;
-        }
-    </style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background-color: black;
+    }
+
+    #theater-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 1s ease; /* Set the transition in CSS */
+        opacity: 1; /* Ensure the video starts fully visible */
+    }
+</style>
 </head>
 <body>
-    <video id="theater-video" loop autoplay muted>
-        <source id="video-source" src="videos/A_New_Day.mp4" type="video/mp4">
+    <video id="theater-video" autoplay muted loop>
+        <source id="video-source" src="videos/Always.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
@@ -106,16 +114,7 @@
             var videoElement = document.getElementById("theater-video");
             var sourceElement = document.getElementById("video-source");
         
-            // Ensure the video is fully opaque
-            videoElement.style.opacity = 1;
-        
-            // Apply fade-out effect
-            videoElement.style.transition = "opacity 1s ease"; // Set transition effect
-        
-            // Force reflow
-            void videoElement.offsetWidth;
-        
-            // Start fading out
+            // Start fade-out
             videoElement.style.opacity = 0;
         
             // Wait for the fade-out to complete before switching the video
@@ -124,25 +123,17 @@
                 sourceElement.src = videoPath;
                 videoElement.load();  // Load the new video
         
-                // Ensure the fade-in happens after the video can be played
                 videoElement.oncanplay = function () {
                     // Remove the event listener to prevent multiple triggers
                     videoElement.oncanplay = null;
         
-                    // Apply fade-in effect
-                    videoElement.style.transition = "opacity 1s ease";  // Ensure fade-in transition is set
-        
-                    // Force reflow
-                    void videoElement.offsetWidth;
-        
-                    // Start fading in
+                    // Start fade-in
                     videoElement.style.opacity = 1;
         
                     videoElement.play();  // Start playing the video
                 };
             }, 1000);  // 1 second timeout to match the fade-out duration
         }
-
     </script>
 </body>
 </html>
