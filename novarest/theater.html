@@ -26,8 +26,8 @@
 
     #brain-container {
         position: absolute;
-        top: 10px; /* Adjust to position brain */
-        right: 10px; /* Adjust to position brain */
+        top: 10px; /* Adjust to position the brain model */
+        right: 10px; /* Adjust to position the brain model */
         width: 300px; /* Set the width of the brain model canvas */
         height: 300px; /* Set the height of the brain model canvas */
         z-index: 2; /* Brain model is on top of the video */
@@ -49,7 +49,7 @@
     <script src="https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/loaders/GLTFLoader.js"></script>
 
     <script>
-        let scene, camera, renderer, videoTexture, screenMesh, model;
+        let scene, camera, renderer, model;
         init();
         animate();
 
@@ -61,30 +61,20 @@
             scene = new THREE.Scene();
 
             // Camera setup
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 2, 8); // Adjust camera distance to fit larger screen
+            camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000); // Aspect ratio is 1 because canvas is square (300x300)
+            camera.position.set(0, 0, 5); // Adjust camera position to fit the brain model
 
             // Renderer setup
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(300, 300); // Set the size of the renderer to fit the brain container
+            renderer.setClearColor(0x000000, 0); // Make the renderer background transparent
             document.getElementById('brain-container').appendChild(renderer.domElement);
 
-            // Movie screen setup
-            const screenGeometry = new THREE.PlaneGeometry(16, 9); // Larger screen (16:9)
-            var video = document.getElementById('theater-video');
-            video.muted = false;
-            video.play();
-            videoTexture = new THREE.VideoTexture(video);
-            const screenMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
-            screenMesh = new THREE.Mesh(screenGeometry, screenMaterial);
-            screenMesh.position.set(0, 2.5, -7); // Position screen in front
-            scene.add(screenMesh);
-
-            // Load the brain model at the top right corner
+            // Load the brain model
             const loader = new THREE.GLTFLoader();
             loader.load('brain.glb', function (gltf) {
                 model = gltf.scene;
-                model.position.set(0, 0, 0); // Positioned within the canvas
+                model.position.set(0, 0, 0); // Center the model in the scene
                 model.scale.set(modelScale, modelScale, modelScale);
 
                 // Change the color of the model
@@ -98,7 +88,7 @@
             });
 
             // Ambient light for better visibility
-            const ambientLight = new THREE.AmbientLight(0x404040, 2); // Soft light
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Adjust light intensity
             scene.add(ambientLight);
 
             // Camera controls
@@ -106,13 +96,7 @@
             controls.target.set(0, 0, 0);
             controls.update();
 
-            window.addEventListener('resize', onWindowResize, false);
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(300, 300); // Keep renderer size fixed for brain container
+            // Remove event listener for window resize since canvas size is fixed
         }
 
         function animate() {
@@ -126,8 +110,7 @@
             renderer.render(scene, camera);
         }
 
-        // Example of how to call the function
-        // playNewVideo('videos/Your_New_Video.mp4');        
+        // Function to change the video with a fade effect
         function playNewVideo(videoPath) {
             var videoElement = document.getElementById("theater-video");
             var sourceElement = document.getElementById("video-source");
