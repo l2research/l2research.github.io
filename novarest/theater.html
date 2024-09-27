@@ -9,22 +9,40 @@
         height: 100%;
         margin: 0;
         background-color: black;
+        overflow: hidden; /* Prevents scrolling */
     }
 
     #theater-video {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: opacity 1s ease; /* Set the transition in CSS */
         opacity: 1; /* Ensure the video starts fully visible */
+        z-index: 1; /* Video is on a lower layer */
+    }
+
+    #brain-container {
+        position: absolute;
+        top: 10px; /* Adjust to position brain */
+        right: 10px; /* Adjust to position brain */
+        width: 300px; /* Set the width of the brain model canvas */
+        height: 300px; /* Set the height of the brain model canvas */
+        z-index: 2; /* Brain model is on top of the video */
     }
     </style>
 </head>
 <body>
+    <!-- Background Video -->
     <video id="theater-video" autoplay muted loop>
         <source id="video-source" src="videos/Always.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
+
+    <!-- 3D Brain Object Container -->
+    <div id="brain-container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/controls/OrbitControls.js"></script>
@@ -37,7 +55,7 @@
 
         function init() {
             const modelColor = '#c88d94';
-            const modelScale = 3.0;
+            const modelScale = 1.5;
             
             // Scene setup
             scene = new THREE.Scene();
@@ -48,8 +66,8 @@
 
             // Renderer setup
             renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
+            renderer.setSize(300, 300); // Set the size of the renderer to fit the brain container
+            document.getElementById('brain-container').appendChild(renderer.domElement);
 
             // Movie screen setup
             const screenGeometry = new THREE.PlaneGeometry(16, 9); // Larger screen (16:9)
@@ -66,7 +84,7 @@
             const loader = new THREE.GLTFLoader();
             loader.load('brain.glb', function (gltf) {
                 model = gltf.scene;
-                model.position.set(5.0, 5, 0); // Positioning at the top right
+                model.position.set(0, 0, 0); // Positioned within the canvas
                 model.scale.set(modelScale, modelScale, modelScale);
 
                 // Change the color of the model
@@ -85,7 +103,7 @@
 
             // Camera controls
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.target.set(0, 2, -5);
+            controls.target.set(0, 0, 0);
             controls.update();
 
             window.addEventListener('resize', onWindowResize, false);
@@ -94,7 +112,7 @@
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(300, 300); // Keep renderer size fixed for brain container
         }
 
         function animate() {
