@@ -36,7 +36,7 @@
 </head>
 <body>
     <!-- Background Video -->
-    <video id="theater-video" autoplay muted loop>
+    <video id="theater-video" autoplay loop>
         <source id="video-source" src="videos/Always.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
@@ -96,7 +96,10 @@
             controls.target.set(0, 0, 0);
             controls.update();
 
-            // Remove event listener for window resize since canvas size is fixed
+            // Unmute and play the video
+            var video = document.getElementById('theater-video');
+            video.muted = false;
+            video.play();
         }
 
         function animate() {
@@ -132,6 +135,7 @@
                     videoElement.style.opacity = 1;
         
                     videoElement.play();  // Start playing the video
+                    videoElement.muted = false; // Unmute the video
                 };
             }, 1000);  // 1 second timeout to match the fade-out duration
         }
